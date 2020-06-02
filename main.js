@@ -90,7 +90,6 @@ async function register ({
       role: 2,
       displayName: params.username
     })
-    return res.sendStatus(200)
   })
 
 }
