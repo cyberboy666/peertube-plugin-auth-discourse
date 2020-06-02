@@ -1,9 +1,9 @@
 {
-  "name": "peertube-plugin-quickstart",
-  "description": "PeerTube plugin quickstart",
-  "version": "0.0.2",
-  "author": "Chocobozzz",
-  "bugs": "https://framagit.org/framasoft/peertube/peertube-plugin-quickstart/issues",
+  "name": "peertube-plugin-auth-discourse",
+  "description": "Login to peertube using Discourse as an SSO idenity provider",
+  "version": "0.0.1",
+  "author": "langolierz",
+  "bugs": "https://github.com/langolierz/peertube-plugin-auth-discourse/issues",
   "clientScripts": [
     {
       "script": "dist/common-client-plugin.js",
@@ -38,5 +38,9 @@
   },
   "translations": {
     "fr-FR": "./languages/fr.json"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "querystring": "^0.2.0"
   }
 }
