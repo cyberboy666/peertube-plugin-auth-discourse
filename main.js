@@ -4,6 +4,7 @@ const querystring = require('querystring')
 const store = {}
 
 async function register ({
+  registerHook,
   registerExternalAuth,
   unregisterExternalAuth,
   registerSetting,
@@ -29,6 +30,14 @@ async function register ({
     default: 'https://example.com'
   })
 
+  registerSetting({
+    name: 'hide_default_signup',
+    label: 'hide default signup',
+    type: 'input-checkbox',
+    private: false,
+    default: false
+  })
+
   const baseUrl = peertubeHelpers.config.getWebserverUrl()
 
   storeSettings(await settingsManager.getSettings([ 'sso_secret', 'discourse_base_url' ]))
@@ -38,7 +47,7 @@ async function register ({
 
   const result = registerExternalAuth({
     authName: 'discourse-auth',
-    authDisplayName: () => 'JOIN',
+    authDisplayName: () => 'discourse',
     onAuthRequest: (req, res) => {
       // generate random nonce and compute hmac-sha256
       var hmac = crypto.createHmac('sha256', store.sso_secret)
@@ -68,27 +77,25 @@ async function register ({
     hmac.update(decoded_sso)
     var hash = hmac.digest('hex')
     // exit if no match
-    if(hash != sig){
-      console.log('sig doesnt match')
-      return res.sendStatus(401)
-    }
+    // if(hash != sig){
+    //   console.log('sig doesnt match')
+    //   return res.sendStatus(401)
+    // }
     // decode the sso and compare the returned nonce
     var b = new Buffer(sso, 'base64')
     var embedded_query = b.toString('utf-8')
     var params = querystring.parse(embedded_query)
     // exit if no match
-    if(params.nonce != store.nonce){
-      console.log('nonce doesnt match')
-      return res.sendStatus(401)
-    }
+    // if(params.nonce != store.nonce){
+    //   console.log('nonce doesnt match')
+    //   return res.sendStatus(401)
+    // }
     // if all checks pass then authenticate the user
-    store.userAuthenticated({
+    return store.userAuthenticated({
       req,
       res,
       username: params.username,
-      email: params.email,
-      role: 2,
-      displayName: params.username
+      email: params.email
     })
   })
 
