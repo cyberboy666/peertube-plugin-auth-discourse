@@ -1,7 +1,7 @@
 {
   "name": "peertube-plugin-auth-discourse",
   "description": "Login to peertube using Discourse as an SSO idenity provider",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "author": "cyberboy666",
   "bugs": "https://github.com/cyberboy666/peertube-plugin-auth-discourse/issues",
   "clientScripts": [

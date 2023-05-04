@@ -94,7 +94,7 @@ async function register ({
     return store.userAuthenticated({
       req,
       res,
-      username: params.username,
+      username: params.username.toLowerCase(),
       email: params.email
     })
   })
