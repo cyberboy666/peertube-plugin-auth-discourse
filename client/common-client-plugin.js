@@ -10,8 +10,15 @@ function register ({ registerHook, peertubeHelpers }) {
     ) // listen on menu click
 }
 
+function findNodeByInnerText(nodelist, innerText){
+  for(let ii = 0; ii < nodelist.length; ii++){
+      if(nodelist[ii].innerText === innerText)
+          return nodelist[ii]
+  }
+}
+
 function hideDefaultSignin (){
-  var loginButton = document.querySelector('a.orange-button')
+  var loginButton = findNodeByInnerText(document.querySelectorAll('a.orange-button'), 'Login')
   if(loginButton == null) return // return if menu is hidden
   loginButton.style.visibility = "hidden" // hide login button
   var createButton = document.querySelector('a.create-account-button')
@@ -24,7 +31,7 @@ function hideDefaultSignin (){
   if( newJoinButton == null ){
     // create new external-login button
     newJoinButton = document.createElement('a')
-    newJoinButton.setAttribute('href', '/plugins/auth-discourse/0.0.9/auth/discourse-auth') // needs to have the correct version here
+    newJoinButton.setAttribute('href', '/plugins/auth-discourse/0.0.10/auth/discourse-auth') // needs to have the correct version here
     newJoinButton.className = 'new-join-button'
     newJoinButton.innerHTML = 'JOIN'
     newJoinButton.style.cssText = ' display: inline-block; border: none; font-weight: 600; font-size: 15px; height: 30px; line-height: 30px; border-radius: 3px; text-align: center; padding: 0 17px 0 13px; cursor: pointer; display: block; width: 100%; color: #fff; background-color: #fd7e14;'
