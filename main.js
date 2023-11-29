@@ -38,9 +38,17 @@ async function register ({
     default: false
   })
 
+  registerSetting({
+    name: 'allow_login_prompt',
+    label: 'allow login prompt',
+    type: 'input-checkbox',
+    private: false,
+    default: false
+  })
+
   const baseUrl = peertubeHelpers.config.getWebserverUrl()
 
-  storeSettings(await settingsManager.getSettings([ 'sso_secret', 'discourse_base_url' ]))
+  storeSettings(await settingsManager.getSettings([ 'sso_secret', 'discourse_base_url', 'hide_default_signup', 'allow_login_prompt' ]))
   settingsManager.onSettingsChange(settings => {
     storeSettings(settings)
   })
@@ -56,6 +64,9 @@ async function register ({
       // create payload with nonice and return url and nonce
       var return_url = baseUrl + '/plugins/auth-discourse/router/external-auth-callback'
       var payload = 'nonce=' + store.nonce + '&return_sso_url=' + return_url
+      if(store.allow_login_prompt == false){
+        payload = payload + '&prompt=none'
+      }
       // create signature from payload with secret
       var payload_b64 = new Buffer(payload).toString('base64')
       hmac.update(payload_b64)
@@ -77,19 +88,25 @@ async function register ({
     hmac.update(decoded_sso)
     var hash = hmac.digest('hex')
     // exit if no match
-    // if(hash != sig){
-    //   console.log('sig doesnt match')
-    //   return res.sendStatus(401)
-    // }
+    if(hash != sig){
+      console.log('sig doesnt match')
+      return res.sendStatus(401)
+    }
     // decode the sso and compare the returned nonce
     var b = new Buffer(sso, 'base64')
     var embedded_query = b.toString('utf-8')
     var params = querystring.parse(embedded_query)
+    console.log('-------------------------------- params are' + embedded_query)
     // exit if no match
-    // if(params.nonce != store.nonce){
-    //   console.log('nonce doesnt match')
-    //   return res.sendStatus(401)
-    // }
+    if(params.nonce != store.nonce){
+      console.log('nonce doesnt match')
+      return res.sendStatus(401)
+    }
+    // exit if no user
+    if(params.username === undefined){
+      console.log('no account found')
+      return res.sendStatus(401)
+    }
     // if all checks pass then authenticate the user
     return store.userAuthenticated({
       req,
@@ -104,6 +121,8 @@ async function register ({
 function storeSettings (settings) {
   if(settings.sso_secret) store.sso_secret = settings.sso_secret
   if(settings.discourse_base_url) store.discourse_base_url = settings.discourse_base_url
+  store.hide_default_signup = settings.hide_default_signup
+  store.allow_login_prompt = settings.allow_login_prompt
 }
 
 async function unregister () {
